@@ -9,20 +9,20 @@ variable "my_ami" {
 }
 
 
-variable "aws_default_vpc" {
-  description = "aws default vpc"
+variable "cidr_name" {
+  description = "Name of cidr block"
   type        = string
 }
-
+variable "vpc_tag_name" {
+  description = "tag Name of Vpc"
+  type        = string
+}
 variable "aws_elastic_ip" {
   description = "aws elastic ip"
   type        = string
 }
 
-variable "aws_default_public_subnet" {
-  description = "aws default public subnet"
-  type        = string
-}
+
 
 variable "domain_name" {
   description = "Hosted Zone"
