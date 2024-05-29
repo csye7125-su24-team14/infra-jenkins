@@ -8,13 +8,12 @@ variable "aws_profile" {
   type        = string
 }
 
-variable "aws_default_vpc" {
-  description = "aws default vpc"
+variable "cidr_name" {
+  description = "Name of cidr block"
   type        = string
 }
-
-variable "aws_default_public_subnet" {
-  description = "aws default public subnet"
+variable "vpc_tag_name" {
+  description = "tag Name of Vpc"
   type        = string
 }
 
