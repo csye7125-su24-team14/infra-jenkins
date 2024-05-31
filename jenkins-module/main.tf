@@ -80,34 +80,34 @@ resource "aws_route_table_association" "private_subnet_association" {
 }
 
 resource "aws_security_group" "app_sg" {
-  name_prefix = "jenkins_app"         
+  name_prefix = "jenkins_app"
   vpc_id      = aws_vpc.infra_vpc.id
 
   ingress {
-    from_port   = 22 
+    from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] 
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-#   ingress {
-#     from_port   = 80
-#     to_port     = 80
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"] 
-#   }
+  #   ingress {
+  #     from_port   = 80
+  #     to_port     = 80
+  #     protocol    = "tcp"
+  #     cidr_blocks = ["0.0.0.0/0"] 
+  #   }
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] 
-  }
-  ingress {
-    from_port = 8080 
-    to_port   = 8080
-    protocol  = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  # ingress {
+  #   from_port   = 8080
+  #   to_port     = 8080
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
 
 
   egress {
@@ -118,27 +118,27 @@ resource "aws_security_group" "app_sg" {
   }
 
   tags = {
-    Name = "ec2-jenkins-sg-${timestamp()}" 
+    Name = "ec2-jenkins-sg-${timestamp()}"
   }
 }
 
 resource "aws_instance" "jenkins_instance" {
-  ami                    = var.my_ami                    
-  instance_type          = "t2.micro"                    
-  key_name               = "ec2"                          
-  vpc_security_group_ids = [aws_security_group.app_sg.id] 
+  ami                    = var.my_ami
+  instance_type          = "t2.micro"
+  key_name               = "ec2"
+  vpc_security_group_ids = [aws_security_group.app_sg.id]
   subnet_id              = local.public_subnet_ids[0]
   # Enable protection against accidental termination
   disable_api_termination = false
-  user_data            = <<EOF
+  user_data               = <<EOF
 #!/bin/bash
+sudo mkdir -p /var/lib/jenkins/init.groovy.d
+sudo cp /home/ubuntu/admin-user.groovy /var/lib/jenkins/init.groovy.d/
+sudo cp /home/ubuntu/plugins.groovy /var/lib/jenkins/init.groovy.d/
 sudo systemctl enable jenkins
 
-sudo systemctl start jenkins
-echo "{
-    acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
-}
-
+sudo systemctl restart jenkins
+echo "
 ${var.domain_name} {
     reverse_proxy localhost:8080
 }" | sudo tee /etc/caddy/Caddyfile >/dev/null
@@ -147,12 +147,12 @@ ${var.domain_name} {
 sudo systemctl restart caddy
   EOF
   root_block_device {
-    volume_size           = 20    
-    volume_type           = "gp3" 
+    volume_size           = 30
+    volume_type           = "gp3"
     delete_on_termination = true
   }
   tags = {
-    Name = "jenkins-instance-${timestamp()}" 
+    Name = "jenkins-instance-${timestamp()}"
   }
 }
 data "aws_eip" "existing_eip" {
