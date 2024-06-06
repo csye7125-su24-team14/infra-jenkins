@@ -37,3 +37,34 @@ variable "aws_account_id" {
   description = "Aws Accound ID"
   type        = string
 }
+
+variable "docker_hub_password" {
+  description = "Docker Hub Password"
+  type        = string
+}
+
+variable "docker_hub_username" {
+  description = "Docker Hub Username"
+  type        = string
+}
+
+variable "git_hub_username" {
+  description = "Git Hub Username"
+  type        = string
+}
+
+variable "git_hub_password" {
+  description = "Git Hub Password"
+  type        = string
+}
+
+
+variable "jenkins_admin_user_password" {
+  description = "Jenkins admin user password"
+  type        = string
+}
+
+variable "jenkins_admin_username" {
+  description = "Jenkins admin user name"
+  type        = string
+}

@@ -23,4 +23,10 @@ module "jenkins_app" {
   vpc_tag_name   = var.vpc_tag_name
   cidr_name      = var.cidr_name
   aws_elastic_ip = var.aws_elastic_ip
+  docker_hub_username = var.docker_hub_username
+  docker_hub_password = var.docker_hub_password
+  jenkins_admin_user_password = var.jenkins_admin_user_password
+  jenkins_admin_username = var.jenkins_admin_username
+  git_hub_username = var.git_hub_username
+  git_hub_password = var.git_hub_password
 }
