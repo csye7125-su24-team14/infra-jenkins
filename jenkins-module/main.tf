@@ -90,12 +90,12 @@ resource "aws_security_group" "app_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  #   ingress {
-  #     from_port   = 80
-  #     to_port     = 80
-  #     protocol    = "tcp"
-  #     cidr_blocks = ["0.0.0.0/0"] 
-  #   }
+  # ingress {
+  #   from_port   = 80
+  #   to_port     = 80
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
   ingress {
     from_port   = 443
     to_port     = 443
@@ -130,21 +130,37 @@ resource "aws_instance" "jenkins_instance" {
   subnet_id              = local.public_subnet_ids[0]
   # Enable protection against accidental termination
   disable_api_termination = false
-  user_data               = <<EOF
-#!/bin/bash
-sudo mkdir -p /var/lib/jenkins/init.groovy.d
-sudo cp /home/ubuntu/admin-user.groovy /var/lib/jenkins/init.groovy.d/
-sudo cp /home/ubuntu/plugins.groovy /var/lib/jenkins/init.groovy.d/
-sudo systemctl enable jenkins
+  user_data               = <<-EOF
+    #!/bin/bash
 
-sudo systemctl restart jenkins
-echo "
-${var.domain_name} {
-    reverse_proxy localhost:8080
-}" | sudo tee /etc/caddy/Caddyfile >/dev/null
+    sudo usermod -a -G docker jenkins
+    sudo tee /etc/jenkins.env > /dev/null <<EOF1
+    DOCKER_USERNAME=${var.docker_hub_username}
+    DOCKER_PASSWORD=${var.docker_hub_password}
+    JENKINS_ADMIN_USER_PASSWORD=${var.jenkins_admin_user_password}
+    JENKINS_ADMIN_USERNAME=${var.jenkins_admin_username}
+    GIT_USERNAME=${var.git_hub_username}
+    GIT_PASSWORD=${var.git_hub_password}
+    EOF1
 
-# Restart Caddy
-sudo systemctl restart caddy
+    sudo mkdir -p /var/lib/jenkins/init.groovy.d
+    sudo mkdir -p /var/lib/jenkins/dsl_scripts
+    sudo cp /home/ubuntu/admin-user.groovy /var/lib/jenkins/init.groovy.d/
+    sudo cp /home/ubuntu/plugins.groovy /var/lib/jenkins/init.groovy.d/
+    sudo cp /home/ubuntu/docker_credential.groovy /var/lib/jenkins/init.groovy.d/
+    sudo cp /home/ubuntu/job_dsl_script.groovy /var/lib/jenkins/dsl_scripts/
+    sudo systemctl enable jenkins
+
+    sudo systemctl restart jenkins
+    echo "{
+        acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+    }
+    ${var.domain_name} {
+        reverse_proxy localhost:8080
+    }" | sudo tee /etc/caddy/Caddyfile >/dev/null
+
+    # Restart Caddy
+    sudo systemctl restart caddy
   EOF
   root_block_device {
     volume_size           = 30
