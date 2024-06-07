@@ -148,13 +148,12 @@ resource "aws_instance" "jenkins_instance" {
     sudo cp /home/ubuntu/admin-user.groovy /var/lib/jenkins/init.groovy.d/
     sudo cp /home/ubuntu/plugins.groovy /var/lib/jenkins/init.groovy.d/
     sudo cp /home/ubuntu/docker_credential.groovy /var/lib/jenkins/init.groovy.d/
+    # sudo cp /home/ubuntu/seed_job.groovy /var/lib/jenkins/init.groovy.d/
     sudo cp /home/ubuntu/job_dsl_script.groovy /var/lib/jenkins/dsl_scripts/
     sudo systemctl enable jenkins
 
     sudo systemctl restart jenkins
-    echo "{
-        acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
-    }
+    echo "
     ${var.domain_name} {
         reverse_proxy localhost:8080
     }" | sudo tee /etc/caddy/Caddyfile >/dev/null
