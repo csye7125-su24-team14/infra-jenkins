@@ -90,24 +90,24 @@ resource "aws_security_group" "app_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # ingress {
-  #   from_port   = 80
-  #   to_port     = 80
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  # ingress {
-  #   from_port   = 8080
-  #   to_port     = 8080
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
 
   egress {
@@ -148,12 +148,15 @@ resource "aws_instance" "jenkins_instance" {
     sudo cp /home/ubuntu/admin-user.groovy /var/lib/jenkins/init.groovy.d/
     sudo cp /home/ubuntu/plugins.groovy /var/lib/jenkins/init.groovy.d/
     sudo cp /home/ubuntu/docker_credential.groovy /var/lib/jenkins/init.groovy.d/
-    # sudo cp /home/ubuntu/seed_job.groovy /var/lib/jenkins/init.groovy.d/
-    sudo cp /home/ubuntu/job_dsl_script.groovy /var/lib/jenkins/dsl_scripts/
+    sudo cp /home/ubuntu/static_site_builder.groovy /var/lib/jenkins/dsl_scripts/
+    sudo cp /home/ubuntu/pr_check_helm.groovy /var/lib/jenkins/dsl_scripts/ 
+    sudo cp /home/ubuntu/pr_check_webapp_cve.groovy /var/lib/jenkins/dsl_scripts/
     sudo systemctl enable jenkins
 
     sudo systemctl restart jenkins
-    echo "
+    echo "{
+        acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+    }
     ${var.domain_name} {
         reverse_proxy localhost:8080
     }" | sudo tee /etc/caddy/Caddyfile >/dev/null
