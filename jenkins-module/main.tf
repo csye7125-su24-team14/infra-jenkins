@@ -124,7 +124,7 @@ resource "aws_security_group" "app_sg" {
 
 resource "aws_instance" "jenkins_instance" {
   ami                    = var.my_ami
-  instance_type          = "t2.micro"
+  instance_type          = "t2.medium"
   key_name               = "ec2"
   vpc_security_group_ids = [aws_security_group.app_sg.id]
   subnet_id              = local.public_subnet_ids[0]
