@@ -155,6 +155,7 @@ resource "aws_instance" "jenkins_instance" {
     sudo cp /home/ubuntu/pr_check_webapp_producer.groovy /var/lib/jenkins/dsl_scripts/
     sudo cp /home/ubuntu/pr_check_infra_aws.groovy /var/lib/jenkins/dsl_scripts/
     sudo cp /home/ubuntu/pr_check_helm_webapp_consumer.groovy /var/lib/jenkins/dsl_scripts/
+    sudo cp /home/ubuntu/pr_check_helm_eks_autoscaler.groovy /var/lib/jenkins/dsl_scripts/
     sudo systemctl enable jenkins
 
     sudo systemctl restart jenkins
